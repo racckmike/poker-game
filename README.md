@@ -118,12 +118,14 @@ npm test
 
 ## Provisional assumptions (to confirm with Dad)
 
+Confirmed by Dad (2026-11-20): **virtual chips**, **automatic dealer**, **Texas Hold'em**.
+
 | Topic | Current decision | Where to change it |
 |---|---|---|
-| Variant | Texas Hold'em | `packages/game-engine` (subclass `HoldemGame`) |
+| Variant | Texas Hold'em ✅ confirmed | `packages/game-engine` (subclass `HoldemGame`) |
 | Players | 4 to 8 | `MIN_PLAYERS` / `MAX_PLAYERS` in `packages/shared` |
 | Decks | **A single 52-card deck** | see note below |
-| Chips | Virtual: 1,000 to start, blinds 5/10 (editable in the lobby) | `DEFAULT_SETTINGS` |
+| Chips | ✅ Virtual (confirmed): 1,000 to start, blinds 5/10 (editable in the lobby) | `DEFAULT_SETTINGS` |
 | Rooms | Private with a code; no accounts, name only | — |
 | Language | Spanish | interface texts |
 | Card showing | All cards are shown automatically at showdown; whoever wins because everyone folded can choose **Mostrar mis cartas** | `HoldemGame.show` |
