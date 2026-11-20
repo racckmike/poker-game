@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { io, type Socket } from 'socket.io-client';
-import type { ClientToServer, PlayerAction, RoomSettings, ServerToClient, Session, TableView } from '@poker/shared';
+import type { ClientToServer, PlayerAction, RoomSettings, Session, TableView } from '@poker/shared';
+import { announce, hangUp, onSignal, syncPeers } from './media';
+import { socket } from './socket';
 
 type ConnState = 'connecting' | 'online' | 'offline';
 
@@ -57,8 +58,6 @@ function saveName(n: string) {
   }
 }
 
-const socket: Socket<ServerToClient, ClientToServer> = io({ transports: ['websocket', 'polling'] });
-
 type Res<T> = { ok: true; data: T } | { ok: false; error: string };
 
 function call<T>(event: keyof ClientToServer, ...args: unknown[]): Promise<T> {
@@ -91,6 +90,7 @@ export const useStore = create<Store>((set, get) => {
     set({ resuming: true });
     try {
       await call<Session>('room:resume', { roomCode: s.roomCode, token: s.token });
+      announce(); // the server resets cam/mic on every new connection
     } catch {
       saveSession(null);
       set({ view: null });
@@ -105,8 +105,15 @@ export const useStore = create<Store>((set, get) => {
   });
   socket.on('disconnect', () => set({ conn: 'offline' }));
   socket.io.on('reconnect_attempt', () => set({ conn: 'connecting' }));
-  socket.on('state', (view) => set({ view }));
-  socket.on('kicked', (reason) => set({ view: null, error: reason }));
+  socket.on('state', (view) => {
+    set({ view });
+    syncPeers(view);
+  });
+  socket.on('rtc:signal', (m) => void onSignal(m));
+  socket.on('kicked', (reason) => {
+    hangUp();
+    set({ view: null, error: reason });
+  });
 
   return {
     conn: 'connecting',
@@ -128,6 +135,7 @@ export const useStore = create<Store>((set, get) => {
     leave: () =>
       run(async () => {
         await call('room:leave');
+        hangUp();
         saveSession(null);
         set({ view: null });
       }).then(() => {}),

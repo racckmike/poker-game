@@ -8,6 +8,7 @@ import { ChipStack } from './Chips';
 import { Dealer } from './Dealer';
 import { PlayingCard } from './PlayingCard';
 import { Seat } from './Seat';
+import { MediaControls } from './MediaControls';
 
 export function Table({ view }: { view: TableView }) {
   const [stageRef, size] = useSize<HTMLDivElement>();
@@ -30,12 +31,14 @@ export function Table({ view }: { view: TableView }) {
       <div ref={stageRef} className="relative min-h-0 flex-1">
         {size.w > 0 && (
           <>
-            {/* Table: Dad's sketch, a matte felt oval outlined in ink */}
+            {/* Table: Dad's sketch: walnut rail around matte felt, lit from above */}
             <div
-              className="absolute rounded-[999px] border-[3px] border-ink bg-felt shadow-[0_3px_3px_rgb(34_32_28/.2),0_24px_40px_-18px_rgb(34_32_28/.6)]"
+              className="rail absolute rounded-[999px] p-[10px] shadow-[0_4px_6px_rgb(0_0_0/.35),0_40px_70px_-25px_rgb(0_0_0/.85)] sm:p-[16px]"
               style={portrait ? { left: '8%', right: '8%', top: '9%', bottom: '13%' } : { left: '9%', right: '9%', top: '13%', bottom: '15%' }}
             >
-              <div className="absolute inset-[6%] rounded-[999px] border-2 border-felt-line" />
+              <div className="felt relative size-full rounded-[999px] shadow-[inset_0_3px_10px_rgb(0_0_0/.45)]">
+                <div className="absolute inset-[6%] rounded-[999px] border border-cream/10" />
+              </div>
             </div>
 
             {/* Dealer, top centre */}
@@ -51,10 +54,10 @@ export function Table({ view }: { view: TableView }) {
                     {view.street === 'complete' && view.winners?.length && view.phase === 'playing' ? (
                       <WinnerBanner key={`w-${view.handNumber}`} view={view} />
                     ) : (
-                      <motion.div key="pot" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center text-slip">
-                        <p className="font-display text-lg leading-none sm:text-xl">Bote</p>
+                      <motion.div key="pot" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center text-cream">
+                        <p className="font-extrabold tracking-tight text-lg leading-none sm:text-xl">Bote</p>
                         <motion.p key={view.totalPot} initial={{ scale: 1.12 }} animate={{ scale: 1 }} className="tabular mt-1 text-2xl font-bold leading-none sm:text-3xl">
-                          {fmt(view.totalPot)} <span className="font-sans text-base font-medium text-slip/75 sm:text-lg">fichas</span>
+                          {fmt(view.totalPot)} <span className="font-sans text-base font-medium text-cream/70 sm:text-lg">fichas</span>
                         </motion.p>
                       </motion.div>
                     )}
@@ -119,6 +122,8 @@ export function Table({ view }: { view: TableView }) {
               </Positioned>
             ))}
 
+            <MediaControls className="absolute bottom-3 left-3 z-30 sm:bottom-4 sm:left-5" />
+
             {view.phase === 'finished' && <Champion name={view.champion} />}
           </>
         )}
@@ -143,7 +148,7 @@ function Board({ view, winningCards, compact }: { view: TableView; winningCards:
       {Array.from({ length: 5 }).map((_, i) => {
         const c = view.board[i];
         return (
-          <div key={i} className={`relative ${compact ? 'h-14 w-10' : 'h-20 w-14 sm:h-[5.6rem] sm:w-16'} rounded-md border-2 border-dashed border-slip/25`} style={{ perspective: 600 }}>
+          <div key={i} className={`relative ${compact ? 'h-14 w-10' : 'h-20 w-14 sm:h-[5.6rem] sm:w-16'} rounded-md border-2 border-dashed border-cream/20`} style={{ perspective: 600 }}>
             <AnimatePresence>
               {c && (
                 <motion.div
@@ -173,15 +178,15 @@ function WinnerBanner({ view }: { view: TableView }) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -6 }}
       transition={{ type: 'spring', stiffness: 260, damping: 22, delay: 0.25 }}
-      className="rounded-md bg-slip px-4 py-2 text-center shadow-(--shadow-lift) sm:px-5"
+      className="rounded-md bg-room-2 px-4 py-2 text-center shadow-(--shadow-lift) sm:px-5"
       role="status"
     >
       {view.winners!.map((w) => (
         <div key={w.playerId}>
-          <p className="whitespace-nowrap font-display text-xl font-bold leading-tight text-pen sm:text-2xl">
-            ¡{w.name} gana <span className="tabular text-red">{fmt(w.amount)}</span>!
+          <p className="whitespace-nowrap font-extrabold tracking-tight text-xl font-bold leading-tight text-cream sm:text-2xl">
+            ¡{w.name} gana <span className="tabular text-ember">{fmt(w.amount)}</span>!
           </p>
-          {w.hand && <p className="text-[13px] font-medium text-pencil sm:text-sm">con {w.hand.name.toLowerCase()}</p>}
+          {w.hand && <p className="text-[13px] font-medium text-dim sm:text-sm">con {w.hand.name.toLowerCase()}</p>}
         </div>
       ))}
     </motion.div>
@@ -190,10 +195,10 @@ function WinnerBanner({ view }: { view: TableView }) {
 
 function Champion({ name }: { name: string | null }) {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 z-40 grid place-items-center bg-ink/40">
-      <motion.div initial={{ scale: 0.9, y: 10, rotate: -2 }} animate={{ scale: 1, y: 0, rotate: -1 }} className="mx-4 rounded-md bg-slip px-8 py-7 text-center shadow-(--shadow-lift)">
-        <p className="text-sm font-bold text-pencil">Fin de la partida</p>
-        <p className="mt-2 font-display text-4xl font-bold text-red sm:text-5xl">{name ? `¡${name} gana!` : 'Partida terminada'}</p>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 z-40 grid place-items-center bg-black/60">
+      <motion.div initial={{ scale: 0.9, y: 10, rotate: -2 }} animate={{ scale: 1, y: 0, rotate: -1 }} className="mx-4 rounded-md bg-room-2 px-8 py-7 text-center shadow-(--shadow-lift)">
+        <p className="text-sm font-bold text-dim">Fin de la partida</p>
+        <p className="mt-2 font-extrabold tracking-tight text-4xl font-bold text-ember sm:text-5xl">{name ? `¡${name} gana!` : 'Partida terminada'}</p>
       </motion.div>
     </motion.div>
   );
@@ -206,20 +211,20 @@ function InfoBar({ view }: { view: TableView }) {
   const seated = view.players.length;
 
   return (
-    <header className="z-30 flex h-12 shrink-0 items-center gap-3 border-b-2 border-ink/80 bg-paper px-3 text-[13px] sm:h-14 sm:gap-4 sm:px-5 sm:text-sm">
-      <span className="hidden font-display text-xl font-bold text-pen sm:inline">Información</span>
+    <header className="z-30 flex h-12 shrink-0 items-center gap-3 border-b border-cream/10 bg-room/85 px-3 text-[13px] sm:h-14 sm:gap-4 sm:px-5 sm:text-sm">
+      <span className="hidden font-extrabold tracking-tight text-xl font-bold text-cream sm:inline">Información</span>
       <Item label="Sala" value={view.roomCode} hideLabelOnMobile />
       <Item label="Mano" value={`#${view.handNumber}`} />
       <Item label="Ciegas" value={`${fmt(view.settings.smallBlind)}/${fmt(view.settings.bigBlind)}`} />
       <Item label="Jugadores" value={String(seated)} hideOnMobile />
-      <span className={`ml-auto h-2.5 w-2.5 rounded-full ${conn === 'online' ? 'bg-felt' : 'bg-red'}`} title={conn === 'online' ? 'Conectado' : 'Reconectando'} role="img" aria-label={conn === 'online' ? 'Conectado' : 'Reconectando'} />
+      <span className={`ml-auto h-2.5 w-2.5 rounded-full ${conn === 'online' ? 'bg-sage' : 'bg-ember'}`} title={conn === 'online' ? 'Conectado' : 'Reconectando'} role="img" aria-label={conn === 'online' ? 'Conectado' : 'Reconectando'} />
       {confirm ? (
         <span className="flex items-center gap-1">
-          <button onClick={() => void leave()} className="rounded-md bg-red px-2.5 py-1.5 font-bold text-slip hover:bg-red-dark">Salir</button>
-          <button onClick={() => setConfirm(false)} className="rounded-md px-2 py-1.5 font-medium text-pencil hover:text-ink">Cancelar</button>
+          <button onClick={() => void leave()} className="rounded-md bg-ember px-2.5 py-1.5 font-bold text-room hover:bg-ember-dark">Salir</button>
+          <button onClick={() => setConfirm(false)} className="rounded-md px-2 py-1.5 font-medium text-dim hover:text-cream">Cancelar</button>
         </span>
       ) : (
-        <button onClick={() => setConfirm(true)} className="rounded-md px-2.5 py-1.5 font-medium text-pencil hover:bg-paper-2 hover:text-ink">Salir</button>
+        <button onClick={() => setConfirm(true)} className="rounded-md px-2.5 py-1.5 font-medium text-dim hover:bg-room-3 hover:text-cream">Salir</button>
       )}
     </header>
   );
@@ -228,8 +233,8 @@ function InfoBar({ view }: { view: TableView }) {
 function Item({ label, value, hideOnMobile, hideLabelOnMobile }: { label: string; value: string; hideOnMobile?: boolean; hideLabelOnMobile?: boolean }) {
   return (
     <span className={`${hideOnMobile ? 'hidden sm:flex' : 'flex'} items-baseline gap-1.5`}>
-      <span className={`text-pencil ${hideLabelOnMobile ? 'hidden sm:inline' : ''}`}>{label}</span>
-      <span className="tabular whitespace-nowrap font-bold text-ink">{value}</span>
+      <span className={`text-dim ${hideLabelOnMobile ? 'hidden sm:inline' : ''}`}>{label}</span>
+      <span className="tabular whitespace-nowrap font-bold text-cream">{value}</span>
     </span>
   );
 }

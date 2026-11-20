@@ -73,6 +73,11 @@ export interface SeatView {
   /** null = no cards; array of null = face-down cards; strings = visible cards. */
   cards: (Card | null)[] | null;
   lastAction: string | null;
+  /** Camera / microphone the player chose to share (video and audio go peer-to-peer). */
+  cam: boolean;
+  mic: boolean;
+  /** Changes on every reconnect, so peers know to open a fresh call. */
+  rtc: number;
 }
 
 export interface RoomSettings {
@@ -136,9 +141,17 @@ export interface ClientToServer {
   'game:action': (p: { action: PlayerAction; version: number }, ack: Ack<null>) => void;
   'game:show': (ack: Ack<null>) => void;
   'game:restart': (ack: Ack<null>) => void;
+  'media:state': (p: { cam: boolean; mic: boolean }, ack: Ack<null>) => void;
+  /** WebRTC offer/answer/ICE relayed to one player in the same room. No ack. */
+  'rtc:signal': (p: { to: string; data: RtcSignal }) => void;
 }
+
+export type RtcSignal =
+  | { kind: 'offer' | 'answer'; sdp: string; rtc: number }
+  | { kind: 'ice'; candidate: unknown; rtc: number };
 
 export interface ServerToClient {
   state: (view: TableView) => void;
   kicked: (reason: string) => void;
+  'rtc:signal': (p: { from: string; data: RtcSignal }) => void;
 }

@@ -30,6 +30,9 @@ interface Member {
   ready: boolean;
   socketId: string | null;
   disconnectTimer: NodeJS.Timeout | null;
+  cam: boolean;
+  mic: boolean;
+  rtc: number;
 }
 
 type Emit = (socketId: string, view: TableView) => void;
@@ -70,7 +73,7 @@ export class Room {
     const used = new Set([...this.members.values()].map((m) => m.seat));
     let seat = 0;
     while (used.has(seat)) seat++;
-    const m: Member = { id: randomUUID(), name, token: randomBytes(24).toString('base64url'), seat, ready: false, socketId: null, disconnectTimer: null };
+    const m: Member = { id: randomUUID(), name, token: randomBytes(24).toString('base64url'), seat, ready: false, socketId: null, disconnectTimer: null, cam: false, mic: false, rtc: 0 };
     this.members.set(m.id, m);
     if (!this.hostId) this.hostId = m.id;
     // Late joiners sit down with a fresh stack and play from the next hand.
@@ -87,6 +90,8 @@ export class Room {
   attach(m: Member, socketId: string): string | null {
     const previous = m.socketId;
     m.socketId = socketId;
+    m.rtc++;
+    m.cam = m.mic = false; // a new connection starts with media off until the client re-announces it
     if (m.disconnectTimer) clearTimeout(m.disconnectTimer);
     m.disconnectTimer = null;
     if (this.game?.players.some((p) => p.id === m.id)) this.game.setSittingOut(m.id, false);
@@ -98,6 +103,7 @@ export class Room {
   detach(m: Member, socketId: string): void {
     if (m.socketId !== socketId) return; // an older socket closing after a resume
     m.socketId = null;
+    m.cam = m.mic = false;
     // Keep the seat, but don't deal them into new hands until they're back.
     if (this.game?.players.some((p) => p.id === m.id)) this.game.setSittingOut(m.id, true);
     m.disconnectTimer = setTimeout(() => this.removeMember(m.id), this.timing.reconnectGraceMs);
@@ -121,6 +127,13 @@ export class Room {
       return;
     }
     if (this.phase === 'playing' && this.game && !this.game.isBetting()) this.maybeContinue();
+    this.changed();
+  }
+
+  setMedia(id: string, cam: boolean, mic: boolean): void {
+    const m = this.requireMember(id);
+    m.cam = cam;
+    m.mic = mic;
     this.changed();
   }
 
@@ -290,6 +303,9 @@ export class Room {
         isBigBlind: s?.isBigBlind ?? false,
         cards: s?.cards ?? null,
         lastAction: s?.lastAction ?? null,
+        cam: m.cam,
+        mic: m.mic,
+        rtc: m.rtc,
       };
     });
     const nameOf = (id: string) => this.members.get(id)?.name ?? game?.players.find((p) => p.id === id)?.name ?? '—';

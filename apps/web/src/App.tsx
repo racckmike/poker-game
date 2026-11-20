@@ -4,6 +4,7 @@ import { Home } from './components/Home';
 import { Lobby } from './components/Lobby';
 import { Table } from './components/Table';
 import { Toast } from './components/Toast';
+import { RemoteAudio } from './components/MediaControls';
 
 export function App() {
   const view = useStore((s) => s.view);
@@ -22,7 +23,7 @@ export function App() {
           className="min-h-full"
         >
           {screen === 'loading' && (
-            <div className="grid min-h-dvh place-items-center font-display text-2xl text-pen">Volviendo a tu mesa…</div>
+            <div className="grid min-h-dvh place-items-center text-lg font-bold text-dim">Volviendo a tu mesa…</div>
           )}
           {screen === 'home' && <Home />}
           {screen === 'lobby' && <Lobby view={view!} />}
@@ -30,6 +31,7 @@ export function App() {
         </motion.div>
       </AnimatePresence>
       <Toast />
+      <RemoteAudio />
     </div>
   );
 }

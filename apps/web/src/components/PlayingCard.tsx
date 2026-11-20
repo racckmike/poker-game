@@ -41,8 +41,8 @@ export function PlayingCard({ card, size = 'md', dim = false, highlight = false 
 
   if (!card) {
     return (
-      <div className={`${base} card-back border-ink/25`} aria-label="Carta boca abajo">
-        <div className="absolute inset-[3px] rounded-[inherit] border border-pen/50" />
+      <div className={`${base} card-back border-black/40`} aria-label="Carta boca abajo">
+        <div className="absolute inset-[3px] rounded-[inherit] border border-ivory/30" />
       </div>
     );
   }
@@ -57,7 +57,7 @@ export function PlayingCard({ card, size = 'md', dim = false, highlight = false 
   );
   return (
     <div
-      className={`${base} bg-slip ${suit.red ? 'text-red' : 'text-ink'} ${dim ? 'opacity-45' : ''} ${highlight ? 'border-red ring-2 ring-red' : 'border-ink/20'}`}
+      className={`${base} bg-ivory ${suit.red ? 'text-suit' : 'text-ink'} ${dim ? 'opacity-45' : ''} ${highlight ? 'border-ember ring-2 ring-ember' : 'border-black/15'}`}
       aria-label={`${RANK_NAME[rank] ?? rank} de ${suit.label}`}
       role="img"
     >

@@ -58,6 +58,25 @@ async function setupRoom(n: number) {
 }
 
 describe('multiplayer server', () => {
+  it('relays WebRTC signals only inside the room and shares cam/mic state', async () => {
+    const [a, b] = await setupRoom(2);
+    const outsider = new Client();
+    outsider.session = await outsider.call<Session>('room:create', { name: 'Fuera' });
+    const got: { from: string; data: unknown }[] = [];
+    b.socket.on('rtc:signal', (m: { from: string; data: unknown }) => got.push(m));
+    a.socket.emit('rtc:signal', { to: b.session!.playerId, data: { kind: 'offer', sdp: 'x', rtc: 1 } });
+    outsider.socket.emit('rtc:signal', { to: b.session!.playerId, data: { kind: 'offer', sdp: 'evil', rtc: 1 } });
+    a.socket.emit('rtc:signal', { to: b.session!.playerId, data: { kind: 'bogus' } });
+    await until(() => got.length >= 1);
+    await sleep(50);
+    expect(got).toEqual([{ from: a.session!.playerId, data: { kind: 'offer', sdp: 'x', rtc: 1 } }]);
+
+    await a.call('media:state', { cam: true, mic: false });
+    await until(() => !!b.state?.players.find((p) => p.id === a.session!.playerId)?.cam);
+    expect(b.state!.players.find((p) => p.id === a.session!.playerId)!.mic).toBe(false);
+    [a, b, outsider].forEach((c) => c.close());
+  });
+
   it('a lobby/connection change does not void a pending action', async () => {
     const clients = await setupRoom(4);
     await clients[0].call('game:start');

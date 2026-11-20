@@ -4,7 +4,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { Server, type Socket } from 'socket.io';
-import type { Ack, ActionType, ClientToServer, PlayerAction, ServerToClient, Session } from '@poker/shared';
+import type { Ack, ActionType, ClientToServer, PlayerAction, RtcSignal, ServerToClient, Session } from '@poker/shared';
 import { DEFAULT_TIMING, Room, UserError, newRoomCode, type Timing } from './rooms.js';
 
 type PokerSocket = Socket<ClientToServer, ServerToClient, Record<string, never>, { roomCode?: string; playerId?: string }>;
@@ -24,6 +24,12 @@ export async function startServer(opts: { port?: number; timing?: Partial<Timing
   app.get('/health', (_req, res) => {
     res.json({ ok: true });
   });
+  // ICE servers for the video calls. STUN works on most home networks; set TURN_* for players behind strict mobile NATs.
+  app.get('/ice', (_req, res) => {
+    const servers: { urls: string; username?: string; credential?: string }[] = [{ urls: 'stun:stun.l.google.com:19302' }];
+    if (process.env.TURN_URL) servers.push({ urls: process.env.TURN_URL, username: process.env.TURN_USERNAME, credential: process.env.TURN_CREDENTIAL });
+    res.json(servers);
+  });
 
   const staticDir = opts.staticDir ?? resolve(dirname(fileURLToPath(import.meta.url)), '../../web/dist');
   if (existsSync(staticDir)) {
@@ -34,7 +40,7 @@ export async function startServer(opts: { port?: number; timing?: Partial<Timing
   const http: HttpServer = createServer(app);
   const io = new Server<ClientToServer, ServerToClient>(http, {
     cors: process.env.CORS_ORIGIN ? { origin: process.env.CORS_ORIGIN.split(',') } : undefined,
-    maxHttpBufferSize: 10_000,
+    maxHttpBufferSize: 64_000, // room for WebRTC session descriptions
   });
 
   const rooms = new Map<string, Room>();
@@ -51,6 +57,7 @@ export async function startServer(opts: { port?: number; timing?: Partial<Timing
   io.on('connection', (socket: PokerSocket) => {
     const ip = (socket.handshake.headers['x-forwarded-for'] as string | undefined)?.split(',')[0].trim() || socket.handshake.address;
     const bucket = new TokenBucket(12, opts.eventsPerSecond ?? 6); // burst 12, 6 events/s sustained
+    const rtcBucket = new TokenBucket(300, 60); // ICE candidates come in bursts, one set per peer
 
     const current = () => {
       const room = socket.data.roomCode ? rooms.get(socket.data.roomCode) : undefined;
@@ -170,6 +177,26 @@ export async function startServer(opts: { port?: number; timing?: Partial<Timing
       room.restart(id);
       return null;
     }));
+
+    socket.on('media:state', handle((p: { cam: boolean; mic: boolean }) => {
+      const { room, id } = current();
+      room.setMedia(id, p?.cam === true, p?.mic === true);
+      return null;
+    }));
+
+    // Relay only: the server never looks inside, it just checks both ends share a room.
+    socket.on('rtc:signal', (p: { to: string; data: RtcSignal }) => {
+      if (!rtcBucket.take()) return;
+      try {
+        const { room, id } = current();
+        const target = typeof p?.to === 'string' ? room.members.get(p.to) : undefined;
+        const kind = p?.data?.kind;
+        if (!target?.socketId || target.id === id || (kind !== 'offer' && kind !== 'answer' && kind !== 'ice')) return;
+        io.to(target.socketId).emit('rtc:signal', { from: id, data: p.data });
+      } catch {
+        /* not in a room: drop */
+      }
+    });
 
     socket.on('disconnect', () => leaveCurrent(false));
   });

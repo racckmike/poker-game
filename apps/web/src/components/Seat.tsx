@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import type { SeatView } from '@poker/shared';
 import { fmt } from '../store';
-import { Avatar } from './Avatar';
+import { Avatar } from './MediaControls';
 import { PlayingCard } from './PlayingCard';
 
 const STATUS_ES: Partial<Record<SeatView['status'], string>> = {
@@ -58,30 +58,30 @@ export function Seat({ p, isMe, isTurn, isWinner, winningCards, turnDeadline, tu
         </AnimatePresence>
       </div>
 
-      {/* Name plate: a paper slip; red ink border on your turn, circled in red pen when winning */}
+      {/* Name plate: ember border on your turn, circled in ember when winning */}
       <div className="relative">
         <div
           className={[
-            'relative flex items-center rounded-md border-2 bg-slip shadow-(--shadow-object) transition-[border-color,opacity] duration-300',
+            'relative flex items-center rounded-md border-2 bg-room-2 shadow-(--shadow-object) transition-[border-color,opacity] duration-300',
             compact ? 'gap-1.5 py-0.5 pl-0.5 pr-2' : 'gap-2 py-1 pl-1 pr-3',
-            isTurn ? 'border-red' : 'border-transparent',
+            isTurn ? 'border-ember' : 'border-cream/10',
             faded ? 'opacity-60' : '',
           ].join(' ')}
         >
           <div className="relative">
-            <Avatar name={p.name} size={compact ? 26 : isMe ? 40 : 34} />
+            <Avatar p={p} isMe={isMe} size={compact ? 30 : isMe ? 48 : 40} />
             {p.isButton && (
-              <span className="absolute -bottom-1 -right-1 grid h-4 w-4 place-items-center rounded-full border border-ink bg-slip text-[9px] font-extrabold text-ink" title="Botón del repartidor">
+              <span className="absolute -bottom-1 -right-1 grid h-4 w-4 place-items-center rounded-full border border-ink bg-ivory text-[9px] font-extrabold text-ink" title="Botón del repartidor">
                 D
               </span>
             )}
           </div>
           <div className={`min-w-0 leading-tight ${compact ? 'max-w-[68px]' : 'max-w-[110px]'}`}>
-            <p className={`truncate font-bold text-ink ${compact ? 'text-[12px]' : 'text-sm'}`}>
+            <p className={`truncate font-bold text-cream ${compact ? 'text-[12px]' : 'text-sm'}`}>
               {p.name}
-              {isMe && <span className="font-normal text-pencil"> (tú)</span>}
+              {isMe && <span className="font-normal text-dim"> (tú)</span>}
             </p>
-            <p className={`tabular font-bold text-pen ${compact ? 'text-[12px]' : 'text-sm'}`}>{fmt(p.stack)}</p>
+            <p className={`tabular font-bold text-cream ${compact ? 'text-[12px]' : 'text-sm'}`}>{fmt(p.stack)}</p>
           </div>
 
           {isTurn && turnDeadline && (
@@ -91,26 +91,26 @@ export function Seat({ p, isMe, isTurn, isWinner, winningCards, turnDeadline, tu
         {isWinner && <PenCircle />}
       </div>
 
-      {/* Status / last action, on its own paper tag so it reads over felt or paper */}
+      {/* Status / last action, on its own tag so it reads over felt or the room */}
       <div className={`flex h-5 items-center ${compact ? 'text-[11px]' : 'text-xs'}`}>
         {status ? (
-          <span className={`rounded-[3px] px-1.5 py-px font-bold ${p.status === 'allin' ? 'bg-red text-slip' : 'bg-slip/90 text-pencil'}`}>{status}</span>
+          <span className={`rounded-[3px] px-1.5 py-px font-bold ${p.status === 'allin' ? 'bg-ember text-room' : 'bg-room-2/90 text-dim'}`}>{status}</span>
         ) : p.lastAction ? (
-          <span className="rounded-[3px] bg-slip/90 px-1.5 py-px font-medium text-ink">{p.lastAction}</span>
+          <span className="rounded-[3px] bg-room-2/90 px-1.5 py-px font-medium text-cream">{p.lastAction}</span>
         ) : null}
       </div>
     </div>
   );
 }
 
-/** The winner gets circled in red pen: a loose loop that draws itself, overshooting its start. */
+/** The winner gets circled in ember: a loose loop that draws itself, overshooting its start. */
 function PenCircle() {
   return (
     <svg className="pointer-events-none absolute -inset-x-4 -inset-y-3 h-[calc(100%+1.5rem)] w-[calc(100%+2rem)] overflow-visible" viewBox="0 0 200 100" preserveAspectRatio="none" aria-hidden>
       <motion.path
         d="M118 7C64 3 12 18 8 48c-4 30 50 47 100 45 52-2 88-20 86-46C192 20 150 4 96 9 70 12 52 18 40 26"
         fill="none"
-        stroke="var(--color-red)"
+        stroke="var(--color-ember)"
         strokeWidth="2.6"
         strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
@@ -125,9 +125,9 @@ function PenCircle() {
 function TurnBar({ deadline, total }: { deadline: number; total: number }) {
   const remaining = Math.max(0, deadline - Date.now());
   return (
-    <div className="absolute inset-x-3 -bottom-[2px] h-[3px] overflow-hidden rounded-full bg-ink/10">
+    <div className="absolute inset-x-3 -bottom-[2px] h-[3px] overflow-hidden rounded-full bg-black/30">
       <motion.div
-        className="h-full origin-left rounded-full bg-red"
+        className="h-full origin-left rounded-full bg-ember"
         initial={{ scaleX: Math.min(1, remaining / total) }}
         animate={{ scaleX: 0 }}
         transition={{ duration: remaining / 1000, ease: 'linear' }}

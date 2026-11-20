@@ -23,13 +23,13 @@ export function ActionPanel({ view }: { view: TableView }) {
   if (view.phase === 'finished') {
     return (
       <Shell>
-        <p className="text-center text-sm text-pencil">
+        <p className="text-center text-sm text-dim">
           {view.champion ? `${view.champion} se quedó con todas las fichas.` : 'La partida terminó.'}
         </p>
         {view.hostId === view.youId ? (
           <BigButton onClick={() => void restart()} disabled={busy} tone="stake">Jugar otra partida</BigButton>
         ) : (
-          <p className="text-center text-sm text-pencil">El anfitrión puede empezar otra partida.</p>
+          <p className="text-center text-sm text-dim">El anfitrión puede empezar otra partida.</p>
         )}
       </Shell>
     );
@@ -47,9 +47,9 @@ export function ActionPanel({ view }: { view: TableView }) {
     return (
       <Shell>
         <div className="flex min-h-14 items-center justify-center gap-3">
-          <p className="text-center text-[15px] font-medium text-ink sm:text-base">{text}</p>
+          <p className="text-center text-[15px] font-medium text-cream sm:text-base">{text}</p>
           {canShow && (
-            <button onClick={() => { setShownHand(view.handNumber); void show(); }} disabled={busy} className="rounded-md border-2 border-pen px-4 py-2 text-sm font-bold text-pen hover:bg-pen hover:text-slip">
+            <button onClick={() => { setShownHand(view.handNumber); void show(); }} disabled={busy} className="rounded-md border-2 border-cream/50 px-4 py-2 text-sm font-bold text-cream hover:bg-cream hover:text-room">
               Mostrar mis cartas
             </button>
           )}
@@ -76,7 +76,7 @@ export function ActionPanel({ view }: { view: TableView }) {
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <div className="flex gap-1.5">
               {presets.map((p) => (
-                <button key={p.label} onClick={() => setAmount(p.v)} className="rounded-md border border-ink/25 bg-slip px-3 py-1.5 text-[13px] font-bold text-ink hover:border-ink/60">
+                <button key={p.label} onClick={() => setAmount(p.v)} className="rounded-md border border-cream/25 bg-room-2 px-3 py-1.5 text-[13px] font-bold text-cream hover:border-cream/60">
                   {p.label}
                 </button>
               ))}
@@ -100,15 +100,15 @@ export function ActionPanel({ view }: { view: TableView }) {
               onChange={(e) => setAmount(Number(e.target.value))}
               onBlur={() => setAmount((a) => Math.min(range.max, Math.max(range.min, Math.round(a) || range.min)))}
               aria-label="Cantidad exacta"
-              className="tabular ml-auto h-10 w-24 rounded-md border-2 border-ink/30 bg-slip px-2 text-center font-bold text-ink focus:border-pen focus:outline-none sm:ml-0"
+              className="tabular ml-auto h-10 w-24 rounded-md border-2 border-cream/30 bg-room-2 px-2 text-center font-bold text-cream focus:border-ember focus:outline-none sm:ml-0"
             />
           </div>
         )}
         <div className="grid grid-flow-col auto-cols-fr gap-2">
           {l.fold && <BigButton onClick={() => void act({ type: 'fold' })} disabled={busy} tone="quiet">Retirarse</BigButton>}
-          {l.check && <BigButton onClick={() => void act({ type: 'check' })} disabled={busy} tone="pen">Pasar</BigButton>}
+          {l.check && <BigButton onClick={() => void act({ type: 'check' })} disabled={busy} tone="safe">Pasar</BigButton>}
           {l.call > 0 && (
-            <BigButton onClick={() => void act({ type: 'call' })} disabled={busy} tone="pen">
+            <BigButton onClick={() => void act({ type: 'call' })} disabled={busy} tone="safe">
               Igualar <span className="tabular text-[15px] sm:text-base">{fmt(l.call)}</span>
             </BigButton>
           )}
@@ -135,19 +135,19 @@ export function ActionPanel({ view }: { view: TableView }) {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-[8.5rem] shrink-0 items-center border-t-2 border-ink/80 bg-paper px-3 pb-[max(.75rem,env(safe-area-inset-bottom))] pt-3 sm:px-6">
+    <div className="flex min-h-[8.5rem] shrink-0 items-center border-t border-cream/10 bg-room-2 px-3 pb-[max(.75rem,env(safe-area-inset-bottom))] pt-3 sm:px-6">
       <div className="mx-auto w-full max-w-3xl space-y-3">{children}</div>
     </div>
   );
 }
 
-function BigButton({ children, onClick, disabled, tone = 'pen' }: { children: React.ReactNode; onClick: () => void; disabled?: boolean; tone?: 'pen' | 'stake' | 'quiet' | 'outline' }) {
-  // Red is reserved for what is at stake (bet/raise/all-in); blue pen for the safe moves; pencil for folding.
+function BigButton({ children, onClick, disabled, tone = 'safe' }: { children: React.ReactNode; onClick: () => void; disabled?: boolean; tone?: 'safe' | 'stake' | 'quiet' | 'outline' }) {
+  // Ember is reserved for what is at stake (bet/raise/all-in); cream for the safe moves; outline for folding.
   const tones = {
-    pen: 'bg-pen text-slip hover:bg-[#182e70] shadow-(--shadow-object)',
-    stake: 'bg-red text-slip hover:bg-red-dark shadow-(--shadow-object)',
-    quiet: 'border-2 border-ink/40 bg-slip text-ink hover:border-ink',
-    outline: 'border-2 border-red bg-slip text-red hover:bg-red hover:text-slip',
+    safe: 'bg-cream text-room hover:bg-white shadow-(--shadow-object)',
+    stake: 'bg-ember text-room hover:bg-ember-dark shadow-(--shadow-object)',
+    quiet: 'border-2 border-cream/30 text-cream hover:border-cream/70',
+    outline: 'border-2 border-ember text-ember hover:bg-ember hover:text-room',
   };
   return (
     <button onClick={onClick} disabled={disabled} className={`flex h-14 flex-col items-center justify-center whitespace-nowrap rounded-md px-1 text-base font-bold leading-tight sm:flex-row sm:gap-1.5 sm:px-2 transition active:scale-[.97] disabled:opacity-50 sm:text-base ${tones[tone]}`}>

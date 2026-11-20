@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { MAX_PLAYERS, MIN_PLAYERS, type TableView } from '@poker/shared';
 import { fmt, useStore } from '../store';
-import { Avatar } from './Avatar';
+import { Avatar, MediaControls } from './MediaControls';
 
 const STACKS = [500, 1000, 2000, 5000];
 const BLINDS = [10, 20, 50, 100];
@@ -36,26 +36,28 @@ export function Lobby({ view }: { view: TableView }) {
   return (
     <main className="mx-auto flex min-h-dvh max-w-3xl flex-col px-4 py-6 sm:px-6 sm:py-10">
       <header className="flex items-center justify-between">
-        <button onClick={() => void leave()} className="rounded-md px-3 py-2 text-sm font-medium text-pencil hover:bg-paper-2 hover:text-ink">
+        <button onClick={() => void leave()} className="rounded-md px-3 py-2 text-sm font-medium text-dim hover:bg-room-3 hover:text-cream">
           ← Salir
         </button>
-        <span className="font-display text-2xl font-bold text-pen">Sala privada</span>
-        <span className="w-16" />
+        <span className="text-xl font-extrabold tracking-tight text-cream">Sala privada</span>
+        <MediaControls className="items-end" />
       </header>
 
-      <section className="mt-6 rounded-md border-[3px] border-ink bg-felt p-6 text-center text-slip shadow-(--shadow-lift)">
-        <p className="font-display text-xl">Código de invitación</p>
+      <section className="rail mt-6 rounded-2xl p-2.5 text-center shadow-(--shadow-lift)">
+        <div className="felt rounded-xl p-6 text-cream shadow-[inset_0_3px_10px_rgb(0_0_0/.45)]">
+        <p className="text-lg font-bold text-cream/85">Código de invitación</p>
         <p className="tabular mt-1 text-3xl font-bold sm:text-5xl">{view.roomCode}</p>
-        <button onClick={share} className="mt-4 rounded-md bg-slip px-5 py-2.5 text-sm font-bold text-pen shadow-(--shadow-object) transition hover:bg-paper active:scale-95">
+        <button onClick={share} className="mt-4 rounded-md bg-cream px-5 py-2.5 text-sm font-bold text-room shadow-(--shadow-object) transition hover:bg-white active:scale-95">
           {copied ? 'Código copiado' : 'Compartir código'}
         </button>
-        <p className="mt-3 text-sm text-slip/85">Compártelo con tus amigos para que se unan desde su teléfono o computadora.</p>
+        <p className="mt-3 text-sm text-cream/85">Compártelo con tus amigos para que se unan desde su teléfono o computadora.</p>
+        </div>
       </section>
 
       <section className="mt-6">
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="font-display text-3xl font-bold text-pen">Jugadores</h2>
-          <span className="text-sm font-medium text-pencil">
+          <h2 className="text-2xl font-extrabold tracking-tight text-cream">Jugadores</h2>
+          <span className="text-sm font-medium text-dim">
             {view.players.length} de {MAX_PLAYERS} asientos
           </span>
         </div>
@@ -66,24 +68,24 @@ export function Lobby({ view }: { view: TableView }) {
               layout
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
-              className={`flex h-16 items-center gap-3 rounded-md px-3 ${p ? 'bg-slip shadow-(--shadow-object)' : 'border-2 border-dashed border-ink/20 text-pencil'}`}
+              className={`flex h-16 items-center gap-3 rounded-md px-3 ${p ? 'bg-room-2 shadow-(--shadow-object)' : 'border-2 border-dashed border-cream/20 text-dim'}`}
             >
-              <span className="w-5 text-center font-display text-lg text-pencil">{i + 1}</span>
+              <span className="tabular w-5 text-center text-sm text-dim">{i + 1}</span>
               {p ? (
                 <>
-                  <Avatar name={p.name} seat={p.seat} size={40} />
+                  <Avatar p={p} isMe={p.id === view.youId} size={44} />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-bold text-ink">
-                      {p.name} {p.id === view.youId && <span className="font-normal text-pencil">(tú)</span>}
+                    <p className="truncate font-bold text-cream">
+                      {p.name} {p.id === view.youId && <span className="font-normal text-dim">(tú)</span>}
                     </p>
-                    <p className="text-[13px] text-pencil">
+                    <p className="text-[13px] text-dim">
                       {p.connected ? 'Conectado' : 'Desconectado'}
                     </p>
                   </div>
                   {p.isHost ? (
-                    <span className="rounded-[3px] border border-pen px-2 py-0.5 text-[13px] font-bold text-pen">Anfitrión</span>
+                    <span className="rounded-[3px] border border-cream/50 px-2 py-0.5 text-[13px] font-bold text-cream">Anfitrión</span>
                   ) : (
-                    <span className={`rounded-[3px] px-2 py-0.5 text-[13px] font-bold ${p.ready ? 'bg-felt text-slip' : 'border border-ink/25 text-pencil'}`}>
+                    <span className={`rounded-[3px] px-2 py-0.5 text-[13px] font-bold ${p.ready ? 'bg-sage text-room' : 'border border-cream/25 text-dim'}`}>
                       {p.ready ? 'Listo' : 'No listo'}
                     </span>
                   )}
@@ -97,8 +99,8 @@ export function Lobby({ view }: { view: TableView }) {
       </section>
 
       <section className="mt-8">
-        <h2 className="font-display text-3xl font-bold text-pen">Reglas de la mesa</h2>
-        <p className="mt-1 text-sm text-pencil">Texas Hold'em · fichas virtuales {isHost ? '' : '· solo el anfitrión puede cambiarlas'}</p>
+        <h2 className="text-2xl font-extrabold tracking-tight text-cream">Reglas de la mesa</h2>
+        <p className="mt-1 text-sm text-dim">Texas Hold'em · fichas virtuales {isHost ? '' : '· solo el anfitrión puede cambiarlas'}</p>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Select label="Fichas iniciales" value={view.settings.startingStack} options={STACKS} disabled={!isHost || busy} format={fmt}
             onChange={(v) => void updateSettings({ startingStack: v, ...(view.settings.bigBlind * 10 > v ? { bigBlind: 10 } : {}) })} />
@@ -109,13 +111,13 @@ export function Lobby({ view }: { view: TableView }) {
         </div>
       </section>
 
-      <div className="sticky bottom-0 mt-auto bg-paper/95 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
+      <div className="sticky bottom-0 mt-auto bg-room/95 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
         {isHost ? (
           <>
-            <button disabled={!canStart || busy} onClick={() => void startGame()} className="h-14 w-full rounded-md bg-red text-lg font-bold text-slip shadow-(--shadow-object) transition hover:bg-red-dark active:scale-[.98] disabled:opacity-40">
+            <button disabled={!canStart || busy} onClick={() => void startGame()} className="h-14 w-full rounded-md bg-ember text-lg font-bold text-room shadow-(--shadow-object) transition hover:bg-ember-dark active:scale-[.98] disabled:opacity-40">
               Empezar partida
             </button>
-            <p className="mt-2 text-center text-sm font-medium text-pencil">
+            <p className="mt-2 text-center text-sm font-medium text-dim">
               {!enough
                 ? `Se necesitan al menos ${MIN_PLAYERS} jugadores (faltan ${MIN_PLAYERS - view.players.length}).`
                 : notReady.length
@@ -126,10 +128,10 @@ export function Lobby({ view }: { view: TableView }) {
         ) : (
           <>
             <button onClick={() => void setReady(!me.ready)} disabled={busy}
-              className={`h-14 w-full rounded-md text-lg font-bold transition active:scale-[.98] ${me.ready ? 'border-2 border-pen bg-slip text-pen' : 'bg-red text-slip shadow-(--shadow-object) hover:bg-red-dark'}`}>
+              className={`h-14 w-full rounded-md text-lg font-bold transition active:scale-[.98] ${me.ready ? 'border-2 border-cream/30 text-cream' : 'bg-ember text-room shadow-(--shadow-object) hover:bg-ember-dark'}`}>
               {me.ready ? 'Ya no estoy listo' : 'Estoy listo'}
             </button>
-            <p className="mt-2 text-center text-sm font-medium text-pencil">El anfitrión iniciará la partida cuando todos estén listos.</p>
+            <p className="mt-2 text-center text-sm font-medium text-dim">El anfitrión iniciará la partida cuando todos estén listos.</p>
           </>
         )}
       </div>
@@ -143,9 +145,9 @@ function Select({ label, value, options, onChange, disabled, format }: {
   const opts = options.includes(value) ? options : [value, ...options];
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-bold text-ink">{label}</span>
+      <span className="mb-1 block text-sm font-bold text-cream">{label}</span>
       <select value={value} disabled={disabled} onChange={(e) => onChange(Number(e.target.value))}
-        className="h-12 w-full rounded-md border-2 border-ink/30 bg-slip px-3 font-medium text-ink focus:border-pen focus:outline-none disabled:border-ink/15 disabled:text-pencil">
+        className="h-12 w-full rounded-md border-2 border-cream/15 bg-room-2 px-3 font-medium text-cream focus:border-ember focus:outline-none disabled:border-cream/15 disabled:text-dim">
         {opts.map((o) => <option key={o} value={o}>{format(o)}</option>)}
       </select>
     </label>

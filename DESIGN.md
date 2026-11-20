@@ -1,4 +1,4 @@
-# Design: La libreta de papá
+# Design (superseded: see note)
 
 The green felt from Dad's pen sketch, drawn on a grid-paper notebook. Everything else is written in blue ballpoint pen. What is at stake (your turn, your bet, the winner) is marked in solid red ink.
 
@@ -42,3 +42,5 @@ The authored moment is that the winner gets **circled in red pen**: a hand-drawn
 - Board cards flip.
 
 All motion respects reduced-motion.
+
+> **Superseded 2026-11-20:** the user moved to a dark, cozy look (dim room, warm lamp, walnut rail, matte felt, ember for what is at stake). Tokens live in `apps/web/src/index.css`.

@@ -27,7 +27,7 @@ export function Toast() {
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
-            className="pointer-events-auto max-w-md rounded-md border-2 border-red bg-slip px-4 py-3 text-sm font-medium text-ink shadow-(--shadow-lift)"
+            className="pointer-events-auto max-w-md rounded-md border-2 border-ember bg-room-2 px-4 py-3 text-sm font-medium text-cream shadow-(--shadow-lift)"
           >
             {message}
           </motion.button>

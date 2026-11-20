@@ -26,8 +26,8 @@ export function Home() {
         ))}
       </div>
 
-      <h1 className="whitespace-nowrap text-center font-display text-5xl font-bold leading-none text-pen sm:text-7xl">Mesa de Póker</h1>
-      <p className="mt-3 text-lg font-medium text-pencil">Tu mesa. Tus amigos. Tu partida.</p>
+      <h1 className="whitespace-nowrap text-center text-5xl font-extrabold leading-none tracking-tight text-cream sm:text-6xl">Mesa de Póker</h1>
+      <p className="mt-3 text-lg font-medium text-dim">Tu mesa. Tus amigos. Tu partida.</p>
 
       <form
         className="mt-10 w-full space-y-4"
@@ -39,33 +39,33 @@ export function Home() {
         }}
       >
         <label className="block">
-          <span className="mb-1 block text-sm font-bold text-ink">Tu nombre en la mesa</span>
+          <span className="mb-1 block text-sm font-bold text-cream">Tu nombre en la mesa</span>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             maxLength={16}
             autoComplete="nickname"
             placeholder="Ej. Carlos"
-            className="h-14 w-full border-0 border-b-2 border-ink/60 bg-transparent px-1 font-display text-2xl text-pen placeholder:text-pencil/60 focus:border-pen focus:outline-none"
+            className="h-14 w-full rounded-md border-2 border-cream/15 bg-room-2 px-4 text-xl font-bold text-cream placeholder:text-dim/50 focus:border-ember focus:outline-none"
           />
         </label>
 
         {mode === 'menu' ? (
           <>
-            <button type="submit" disabled={!nameOk || busy} className="h-14 w-full rounded-md bg-red text-lg font-bold text-slip shadow-(--shadow-object) transition hover:bg-red-dark active:scale-[.98] disabled:opacity-40">
+            <button type="submit" disabled={!nameOk || busy} className="h-14 w-full rounded-md bg-ember text-lg font-bold text-room shadow-(--shadow-object) transition hover:bg-ember-dark active:scale-[.98] disabled:opacity-40">
               Crear partida
             </button>
-            <button type="button" disabled={!nameOk} onClick={() => setMode('join')} className="h-14 w-full rounded-md border-2 border-pen bg-slip text-lg font-bold text-pen transition hover:bg-pen hover:text-slip active:scale-[.98] disabled:opacity-40">
+            <button type="button" disabled={!nameOk} onClick={() => setMode('join')} className="h-14 w-full rounded-md border-2 border-cream/30 text-lg font-bold text-cream transition hover:border-cream/70 active:scale-[.98] disabled:opacity-40">
               Unirse a una partida
             </button>
-            {!nameOk && <p className="text-center text-sm text-pencil">Escribe tu nombre para empezar.</p>}
+            {!nameOk && <p className="text-center text-sm text-dim">Escribe tu nombre para empezar.</p>}
           </>
         ) : (
           <>
             <label className="block">
-              <span className="mb-1 block text-sm font-bold text-ink">Código de la sala</span>
-              <div className="flex h-14 items-center border-b-2 border-ink/60 focus-within:border-pen">
-                <span className="tabular pl-1 text-xl font-bold text-pencil">POKER-</span>
+              <span className="mb-1 block text-sm font-bold text-cream">Código de la sala</span>
+              <div className="flex h-14 items-center rounded-md border-2 border-cream/15 bg-room-2 focus-within:border-ember">
+                <span className="tabular pl-4 text-xl font-bold text-dim">POKER-</span>
                 <input
                   value={code}
                   onChange={(e) => setCode(e.target.value.toUpperCase().replace(/^POKER-?/, '').replace(/[^A-Z0-9]/g, '').slice(0, 6))}
@@ -74,21 +74,21 @@ export function Home() {
                   autoComplete="off"
                   inputMode="text"
                   placeholder="7KQ3M9"
-                  className="tabular h-full w-full bg-transparent pr-1 text-xl font-bold text-pen placeholder:text-pencil/40 focus:outline-none"
+                  className="tabular h-full w-full bg-transparent pr-1 text-xl font-bold text-cream placeholder:text-dim/40 focus:outline-none pr-4"
                 />
               </div>
             </label>
-            <button type="submit" disabled={code.length !== 6 || busy} className="h-14 w-full rounded-md bg-red text-lg font-bold text-slip shadow-(--shadow-object) transition hover:bg-red-dark active:scale-[.98] disabled:opacity-40">
+            <button type="submit" disabled={code.length !== 6 || busy} className="h-14 w-full rounded-md bg-ember text-lg font-bold text-room shadow-(--shadow-object) transition hover:bg-ember-dark active:scale-[.98] disabled:opacity-40">
               Entrar a la mesa
             </button>
-            <button type="button" onClick={() => setMode('menu')} className="h-12 w-full font-medium text-pencil hover:text-ink">
+            <button type="button" onClick={() => setMode('menu')} className="h-12 w-full font-medium text-dim hover:text-cream">
               Volver
             </button>
           </>
         )}
       </form>
 
-      <p className="mt-12 text-center text-sm text-pencil">Juego amistoso con fichas virtuales. Sin dinero real.</p>
+      <p className="mt-12 text-center text-sm text-dim">Juego amistoso con fichas virtuales. Sin dinero real.</p>
     </main>
   );
 }

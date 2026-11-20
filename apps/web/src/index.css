@@ -1,23 +1,28 @@
 @import 'tailwindcss';
 
-/* World: "La libreta de papá". Matte felt drawn on grid paper; blue ballpoint, red ink for what is at stake. */
+/* World: a card table at home, at night. Dim room, one warm lamp over the table, walnut rail, matte felt.
+   Ember marks what is at stake (your turn, your bet, the winner). No gold, no glow halos. */
 @theme {
-  --color-paper: #f3efe4;
-  --color-paper-2: #e8e1cf;
-  --color-slip: #fcfaf4;
-  --color-felt: #2f6b3f;
-  --color-felt-line: #24552f;
-  --color-ink: #22201c;
-  --color-pencil: #5b564d;
-  --color-pen: #1f3a8a;
-  --color-red: #c8322b;
-  --color-red-dark: #a3241e;
-  --font-display: 'Kalam', 'Comic Neue', cursive;
+  --color-room: #15100c;
+  --color-room-2: #211913;
+  --color-room-3: #2e241c;
+  --color-wood: #5a3a25;
+  --color-wood-dark: #331f13;
+  --color-felt: #2d5b3d;
+  --color-felt-dark: #1f4229;
+  --color-cream: #f3e9d8;
+  --color-dim: #b9aa95;
+  --color-ember: #e2763f;
+  --color-ember-dark: #c9612d;
+  --color-sage: #9cc7a6;
+  --color-ivory: #f7f0e3;
+  --color-ink: #241c15;
+  --color-suit: #b3302a;
   --font-sans: 'Atkinson Hyperlegible Next', system-ui, -apple-system, sans-serif;
   --font-mono: 'Atkinson Hyperlegible Mono', ui-monospace, monospace;
-  /* Real objects on paper or felt: offset + soft blur, never a halo. */
-  --shadow-object: 0 1px 1px rgb(34 32 28 / 0.22), 0 6px 14px -6px rgb(34 32 28 / 0.5);
-  --shadow-lift: 0 2px 2px rgb(34 32 28 / 0.2), 0 14px 28px -10px rgb(34 32 28 / 0.55);
+  /* Objects on the table: offset + soft blur, never a halo. */
+  --shadow-object: 0 1px 2px rgb(0 0 0 / 0.35), 0 6px 14px -6px rgb(0 0 0 / 0.6);
+  --shadow-lift: 0 2px 3px rgb(0 0 0 / 0.3), 0 18px 34px -12px rgb(0 0 0 / 0.75);
 }
 
 html,
@@ -28,24 +33,21 @@ body,
 
 body {
   margin: 0;
-  color: var(--color-ink);
+  color: var(--color-cream);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
-  caret-color: var(--color-pen);
-  /* Grid paper: 24px squares in faded blue ink. */
-  background-color: var(--color-paper);
-  background-image:
-    linear-gradient(rgb(31 58 138 / 0.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(31 58 138 / 0.09) 1px, transparent 1px);
-  background-size: 24px 24px;
-  background-position: -1px -1px;
+  caret-color: var(--color-ember);
+  /* One warm lamp hanging over the middle of the room. */
+  background:
+    radial-gradient(ellipse 75% 60% at 50% 38%, rgb(240 180 106 / 0.11), transparent 70%),
+    var(--color-room);
 }
 
 ::selection {
-  background: var(--color-pen);
-  color: var(--color-slip);
+  background: var(--color-ember);
+  color: var(--color-room);
 }
 
 /* Amounts and codes: fixed-width print digits. */
@@ -54,25 +56,37 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Card back: blue ballpoint cross-hatching on card stock. */
+/* Walnut rail: warm brown with a faint grain running along it. */
+.rail {
+  background:
+    repeating-linear-gradient(97deg, rgb(0 0 0 / 0.07) 0 2px, transparent 2px 11px),
+    linear-gradient(180deg, #6a4630, var(--color-wood) 45%, var(--color-wood-dark));
+}
+
+/* Felt, lit by the lamp: brighter under the light, falling off towards the rail. */
+.felt {
+  background: radial-gradient(ellipse 70% 65% at 50% 42%, #37704b 0%, var(--color-felt) 55%, var(--color-felt-dark) 100%);
+}
+
+/* Card back: oxblood with a fine cream lattice. */
 .card-back {
-  background-color: var(--color-slip);
+  background-color: #74291f;
   background-image:
-    repeating-linear-gradient(45deg, rgb(31 58 138 / 0.55) 0 1px, transparent 1px 5px),
-    repeating-linear-gradient(-45deg, rgb(31 58 138 / 0.55) 0 1px, transparent 1px 5px);
+    repeating-linear-gradient(45deg, rgb(247 240 227 / 0.22) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(-45deg, rgb(247 240 227 / 0.22) 0 1px, transparent 1px 6px);
 }
 
 input[type='range'] {
-  accent-color: var(--color-red);
+  accent-color: var(--color-ember);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-pen);
+  outline: 2px solid var(--color-ember);
   outline-offset: 2px;
 }
 
 * {
-  scrollbar-color: var(--color-pencil) transparent;
+  scrollbar-color: var(--color-room-3) transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {
