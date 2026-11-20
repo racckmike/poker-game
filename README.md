@@ -142,7 +142,13 @@ Confirmed by Dad (2026-11-20): **virtual chips**, **automatic dealer**, **Texas 
 
 ## Deployment
 
-The project is **prepared** to deploy as a single service, but **it is not deployed**.
+**Live (2026-11-20):**
+- Game (page on Vercel, project `poker`): https://poker-woad-tau.vercel.app
+- Game server (Render, free plan, `render.yaml`): https://mesa-de-poker.onrender.com
+- The page finds the server through `VITE_SERVER_URL` (set in Vercel); the server only accepts the page's origin (`CORS_ORIGIN` in `render.yaml`).
+- Render's free plan sleeps after ~15 min without use: the first visit can take about a minute to wake it, and a restart ends open games.
+
+It can also run as a single service:
 
 **Render / Railway / Fly.io (Node):**
 - Build: `npm install && npm run build`
