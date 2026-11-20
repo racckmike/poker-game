@@ -1,8 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "vite",
-  "installCommand": "npm install",
-  "buildCommand": "npm run build -w @poker/web",
-  "outputDirectory": "apps/web/dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "services": {
+    "web": {
+      "root": "./",
+      "framework": "vite",
+      "installCommand": "npm install",
+      "buildCommand": "npm run build -w @poker/web",
+      "outputDirectory": "apps/web/dist"
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": { "service": "web" } }]
 }

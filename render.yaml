@@ -11,4 +11,4 @@ services:
       - key: NODE_VERSION
         value: "22"
       - key: CORS_ORIGIN
-        sync: false # the Vercel page address, e.g. https://poker-xxxx.vercel.app
+        value: https://poker-woad-tau.vercel.app # the page on Vercel

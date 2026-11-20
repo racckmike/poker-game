@@ -5,3 +5,4 @@ dist
 .claude/
 .impeccable/
 .vercel
+.env*
