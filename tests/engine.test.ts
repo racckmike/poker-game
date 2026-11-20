@@ -298,7 +298,7 @@ describe('Texas Hold’em game', () => {
     act(g, { type: 'fold' });
     act(g, { type: 'fold' });
     expect(g.street).toBe('complete');
-    expect(g.winners).toEqual([{ playerId: 'p3', amount: 65 }]);
+    expect(g.winners).toEqual([{ playerId: 'p3', amount: 25 }]); // blinds 15 + the matched 10 of the raise; the other 40 simply goes back
     expect(g.get('p3').stack).toBe(1015);
   });
 

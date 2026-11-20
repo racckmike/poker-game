@@ -70,7 +70,8 @@ export class Room {
     if (this.members.size >= MAX_PLAYERS) throw new UserError('La sala está llena (máximo 8 jugadores)');
     if ([...this.members.values()].some((m) => m.name.toLowerCase() === name.toLowerCase()))
       throw new UserError('Ese nombre ya está en uso en esta sala');
-    const used = new Set([...this.members.values()].map((m) => m.seat));
+    // A player who left mid-hand keeps their seat in the game until the hand ends.
+    const used = new Set([...this.members.values()].map((m) => m.seat).concat(this.game?.players.map((p) => p.seat) ?? []));
     let seat = 0;
     while (used.has(seat)) seat++;
     const m: Member = { id: randomUUID(), name, token: randomBytes(24).toString('base64url'), seat, ready: false, socketId: null, disconnectTimer: null, cam: false, mic: false, rtc: 0 };
@@ -95,6 +96,8 @@ export class Room {
     if (m.disconnectTimer) clearTimeout(m.disconnectTimer);
     m.disconnectTimer = null;
     if (this.game?.players.some((p) => p.id === m.id)) this.game.setSittingOut(m.id, false);
+    // Back in time for their own turn: give them the normal turn time instead of the short disconnected one.
+    if (this.game?.toActId === m.id) this.scheduleTurnTimer();
     this.changed();
     this.maybeContinue();
     return previous && previous !== socketId ? previous : null;
@@ -333,6 +336,7 @@ export class Room {
       totalPot: pots.reduce((s, p) => s + p.amount, 0),
       toActId: game?.toActId ?? null,
       turnDeadline: game?.toActId ? this.turnDeadline : null,
+      serverNow: Date.now(),
       legal: game?.legalActions(viewerId) ?? null,
       winners,
       dealerMessage: this.dealerMessage(),

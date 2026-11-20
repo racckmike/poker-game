@@ -58,6 +58,29 @@ async function setupRoom(n: number) {
 }
 
 describe('multiplayer server', () => {
+  it('someone joining while a leaver still sits in the hand gets a free seat and is dealt in next hand', async () => {
+    const clients = await setupRoom(3);
+    await clients[0].call('game:start');
+    await until(() => clients.every((c) => c.state?.handNumber === 1));
+    const leaver = clients[2];
+    const leaverSeat = leaver.state!.players.find((p) => p.id === leaver.session!.playerId)!.seat;
+    await leaver.call('room:leave');
+    const late = new Client();
+    late.session = await late.call<Session>('room:join', { name: 'Tarde', roomCode: clients[0].session!.roomCode });
+    await until(() => !!late.state);
+    const lateSeat = late.state!.players.find((p) => p.id === late.session!.playerId)!.seat;
+    expect(lateSeat).not.toBe(leaverSeat);
+    // Play on (always the cheapest move) until the newcomer is dealt cards.
+    const table = [clients[0], clients[1], late];
+    for (let i = 0; i < 400 && !late.state!.players.find((p) => p.id === late.session!.playerId)!.cards; i++) {
+      const actor = table.find((c) => c.state?.legal && c.state.toActId === c.session!.playerId);
+      if (actor) await actor.call('game:action', { action: { type: actor.state!.legal!.check ? 'check' : 'fold' }, version: actor.state!.version }).catch(() => {});
+      await sleep(10);
+    }
+    expect(late.state!.players.find((p) => p.id === late.session!.playerId)!.cards).not.toBeNull();
+    [...table, leaver].forEach((c) => c.close());
+  });
+
   it('relays WebRTC signals only inside the room and shares cam/mic state', async () => {
     const [a, b] = await setupRoom(2);
     const outsider = new Client();

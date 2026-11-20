@@ -106,6 +106,8 @@ export const useStore = create<Store>((set, get) => {
   socket.on('disconnect', () => set({ conn: 'offline' }));
   socket.io.on('reconnect_attempt', () => set({ conn: 'connecting' }));
   socket.on('state', (view) => {
+    // Turn deadline in this device's clock (phones are often minutes off).
+    if (view.turnDeadline) view.turnDeadline += Date.now() - view.serverNow;
     set({ view });
     syncPeers(view);
   });

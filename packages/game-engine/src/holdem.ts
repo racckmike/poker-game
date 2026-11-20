@@ -356,7 +356,10 @@ export class HoldemGame {
 
   private afterAction(actor: EnginePlayer | null): void {
     const live = this.players.filter((p) => p.inHand && !p.folded);
-    if (live.length === 1) return this.awardUncontested(live[0]);
+    if (live.length === 1) {
+      this.returnUncalled();
+      return this.awardUncontested(live[0]);
+    }
 
     const actors = live.filter((p) => this.canAct(p));
     const roundDone =
@@ -390,6 +393,7 @@ export class HoldemGame {
 
   private endStreet(): void {
     this.toActId = null;
+    this.returnUncalled();
     for (const p of this.players) {
       p.committed = 0;
       p.lastActedBet = null;
@@ -410,6 +414,18 @@ export class HoldemGame {
     }
     for (const p of this.players) if (p.inHand && !p.folded && !p.allIn) p.lastAction = null;
     this.setNextToAct(this.nextSeat(this.buttonSeat, (p) => this.canAct(p)).seat, true);
+  }
+
+  /** The part of the biggest bet nobody matched goes back to its owner: it is not part of any pot. */
+  private returnUncalled(): void {
+    const [top, second] = [...this.players].sort((a, b) => b.committed - a.committed);
+    const extra = top ? top.committed - (second?.committed ?? 0) : 0;
+    // A folded top bettor (someone who left mid-hand) forfeits it: it stays in the pot as dead money.
+    if (extra <= 0 || top.folded) return;
+    top.stack += extra;
+    top.committed -= extra;
+    top.totalCommitted -= extra;
+    top.allIn = top.stack === 0;
   }
 
   private dealNextStreet(): void {

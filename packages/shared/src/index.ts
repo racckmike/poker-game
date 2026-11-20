@@ -102,8 +102,10 @@ export interface TableView {
   pots: PotView[];
   totalPot: number;
   toActId: string | null;
-  /** Epoch ms when the current turn auto-acts. */
+  /** Epoch ms (server clock) when the current turn auto-acts. */
   turnDeadline: number | null;
+  /** Server clock when this view was sent, so clients can correct their own clock. */
+  serverNow: number;
   /** Legal actions for the viewer only, when it is their turn. */
   legal: LegalActions | null;
   winners: WinnerView[] | null;
