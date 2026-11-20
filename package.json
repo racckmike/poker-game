@@ -1,0 +1,19 @@
+{
+  "name": "poker-game",
+  "private": true,
+  "type": "module",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev": "concurrently -n server,web -c green,yellow \"npm run dev -w @poker/server\" \"npm run dev -w @poker/web\"",
+    "build": "npm run build -w @poker/web && npm run build -w @poker/server",
+    "start": "npm run start -w @poker/server",
+    "test": "vitest run",
+    "typecheck": "tsc -p packages/game-engine && tsc -p packages/shared && tsc -p apps/server && tsc -p apps/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4",
+    "socket.io-client": "^4.8.1"
+  }
+}
