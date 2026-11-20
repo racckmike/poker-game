@@ -4,3 +4,4 @@ dist
 *.log
 .claude/
 .impeccable/
+.vercel

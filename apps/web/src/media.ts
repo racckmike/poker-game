@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { RtcSignal, TableView } from '@poker/shared';
-import { socket } from './socket';
+import { SERVER_URL, socket } from './socket';
 
 /**
  * Optional camera + microphone between players: a full mesh of WebRTC peer connections (≤ 7 per player).
@@ -35,7 +35,7 @@ let myRtc = -1;
 let lastView: TableView | null = null;
 let iceServers: RTCIceServer[] = [{ urls: 'stun:stun.l.google.com:19302' }];
 
-fetch('/ice')
+fetch(`${SERVER_URL}/ice`)
   .then((r) => r.json())
   .then((s: RTCIceServer[]) => {
     if (Array.isArray(s) && s.length) iceServers = s;

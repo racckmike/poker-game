@@ -110,10 +110,14 @@ describe('multiplayer server', () => {
     c.close();
   });
 
-  it('needs four players to start', async () => {
-    const clients = await setupRoom(3);
-    await expect(clients[0].call('game:start')).rejects.toThrow(/al menos 4/);
+  it('needs two players to start, and two are enough', async () => {
+    const [solo] = await setupRoom(1);
+    await expect(solo.call('game:start')).rejects.toThrow(/al menos 2/);
+    solo.close();
+    const clients = await setupRoom(2);
     await expect(clients[1].call('game:start')).rejects.toThrow(/anfitrión/);
+    await clients[0].call('game:start');
+    await until(() => clients.every((c) => c.state?.phase === 'playing' && c.state.handNumber === 1));
     clients.forEach((c) => c.close());
   });
 

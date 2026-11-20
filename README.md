@@ -50,7 +50,7 @@ npx tsx scripts/bots.ts POKER-XXXXXX 3
 1. Open the site → type your name → **Crear partida**. You get a code such as `POKER-7KQ3M9`.
 2. Others open the site → **Unirse a una partida** → type the code.
 3. In the lobby each player taps **Estoy listo**. The host chooses starting chips, blinds and time per turn.
-4. With **4 to 8 players**, everyone ready, the host taps **Empezar partida**.
+4. With **2 to 8 players**, everyone ready, the host taps **Empezar partida**.
 5. Hands follow one after another automatically (6 s pause to see the winner). When one player has all the chips, the match ends and the host can start **Jugar otra partida**.
 
 ---
@@ -123,7 +123,7 @@ Confirmed by Dad (2026-11-20): **virtual chips**, **automatic dealer**, **Texas 
 | Topic | Current decision | Where to change it |
 |---|---|---|
 | Variant | Texas Hold'em ✅ confirmed | `packages/game-engine` (subclass `HoldemGame`) |
-| Players | 4 to 8 | `MIN_PLAYERS` / `MAX_PLAYERS` in `packages/shared` |
+| Players | 2 to 8 | `MIN_PLAYERS` / `MAX_PLAYERS` in `packages/shared` |
 | Decks | **A single 52-card deck** | see note below |
 | Chips | ✅ Virtual (confirmed): 1,000 to start, blinds 5/10 (editable in the lobby) | `DEFAULT_SETTINGS` |
 | Rooms | Private with a code; no accounts, name only | — |

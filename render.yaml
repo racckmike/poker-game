@@ -1,0 +1,14 @@
+# Game server (Socket.IO). One always-on instance: rooms live in memory.
+services:
+  - type: web
+    name: mesa-de-poker
+    runtime: node
+    plan: free
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: CORS_ORIGIN
+        sync: false # the Vercel page address, e.g. https://poker-xxxx.vercel.app

@@ -25,7 +25,9 @@ export async function startServer(opts: { port?: number; timing?: Partial<Timing
     res.json({ ok: true });
   });
   // ICE servers for the video calls. STUN works on most home networks; set TURN_* for players behind strict mobile NATs.
-  app.get('/ice', (_req, res) => {
+  const allowed = (process.env.CORS_ORIGIN ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  app.get('/ice', (req, res) => {
+    if (req.headers.origin && allowed.includes(req.headers.origin)) res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
     const servers: { urls: string; username?: string; credential?: string }[] = [{ urls: 'stun:stun.l.google.com:19302' }];
     if (process.env.TURN_URL) servers.push({ urls: process.env.TURN_URL, username: process.env.TURN_USERNAME, credential: process.env.TURN_CREDENTIAL });
     res.json(servers);
